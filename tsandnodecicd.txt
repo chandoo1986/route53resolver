@@ -1,0 +1,60 @@
+Node version: Which node version are you using
+Package manager: npm or yarn
+Linter: ESLint with TypeScript plugins (e.g., @typescript-eslint).
+Tester: Jest (with ts-jest for TS support) or Vitest.
+Builder: tsc (TypeScript compiler) for transpilation, optionally with bundlers like webpack, Rollup, or esbuild for production optimization.
+
+Checkout (Fetch latest code from repository): Finished
+
+Install Dependencies (Restore packages to run subsequent steps.): 
+npm ci (clean install)
+npm install 
+npm test
+npm install express@4.18.2 --no-save (Do we need express package)
+npm install --save-dev jest supertest
+
+Linting (Enforce code style, catch syntax errors, and ensure TS type safety): 
+ESLint: eslint . --ext .ts,.tsx with config including @typescript-eslint/parser and @typescript-eslint/eslint-plugin. Optionally Prettier for formatting: prettier --check .. Fail on errors.
+npm run lint # Script: "lint": "eslint . --ext .ts --fix"
+
+Type checking (Critical for TS projects to catch type errors early.):
+tsc --noEmit (or integrated into linting/ESLint).
+npm run typecheck  # Script: "typecheck": "tsc --noEmit"
+
+Testing (Run unit/integration/end-to-end tests.)
+Jest: jest --coverage with ts-jest. Vitest: vitest. For E2E: Playwright or Cypress with TS support.
+npm test  # Script: "test": "jest --coverage"
+
+Building (Transpile TS to JS, bundle/minify for production)
+tsc for simple apps, or webpack --mode production, rollup -c, or esbuild for faster builds. For server-side: Generate dist/ folder.
+npm run build  # Script: "build": "tsc" or "webpack --mode production"
+zipping artifacts: zip -r build.zip dist/.
+
+Artifact Storage (Store build outputs for deployment or auditing.):
+Upload to CI artifact store ???
+
+Vulnerability scanning: Security Scan with Snyk
+
+
+Deploying: Push artifacts to hosting environment.
+Lambda update
+
+Post-Deployment: Verify deployment, notify, or run smoke tests.
+Ensures app is live and healthy.
+
+
+
+npm run build --if-present command instructs npm to execute the build script defined in the scripts section of the package.json file, but only if that script is present.
+
+
+
+My notes
+--no-save flag ensures that this installation is not recorded in the dependencies or devDependencies sections of your project's package.json file. This means that if you were to run npm install in this project later, Express 4.18.2 would not be automatically re-installed unless explicitly listed in package.json.
+In a Run step, you can split tests for any language or test tool by using test splitting and the parallelism looping strategy to improve test times.
+Security: Scan for vulnerabilities with npm audit or Snyk in an additional step. Use Dependabot for auto-updates.
+Monorepos: For large TS projects, use tools like Lerna, Nx, or Turborepo to manage multiple packages and parallelize steps.
+Environment-Specific Builds: Use .env files or CI secrets for staging/prod configs. Build once, deploy many (immutable artifacts).
+Jest: provides a complete testing solution, including a test runner, assertion library, and mocking capabilities, making it suitable for unit, integration, and snapshot testing.
+supertest: Supertest is a Node.js library designed for testing HTTP servers. It simplifies the process of making HTTP requests to your API and asserting the responses, making it ideal for integration and end-to-end testing of web applications.
+Mocha tests
+A common approach in Node.js is to use the dotenv package to load environment variables from a .env file.
