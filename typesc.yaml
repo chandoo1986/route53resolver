@@ -1,0 +1,84 @@
+pipeline:
+  name: typescript-node-pipeline
+  identifier: tsnodepipeline
+  projectIdentifier: default
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Build and Test TS App
+        identifier: build_ts_app
+        type: CI
+        spec:
+          cloneCodebase: true  # Handles checkout from repo
+          caching:
+            enabled: true  # Cache node_modules for faster builds
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              # Install dependencies (adapt for TS)
+              - step:
+                  type: Run
+                  identifier: install_deps
+                  name: Install Dependencies
+                  spec:
+                    shell: Sh
+                    command: |
+                      npm ci  # Use ci for clean install
+                      npm install typescript @types/node @typescript-eslint/eslint-plugin --save-dev
+              # Linting
+              - step:
+                  type: Run
+                  identifier: lint_ts
+                  name: Lint TypeScript
+                  spec:
+                    shell: Sh
+                    command: |
+                      npm run lint:ts  # e.g., "eslint src/**/*.ts"
+              # Testing
+              - step:
+                  type: Run
+                  identifier: test_ts
+                  name: Run Tests
+                  spec:
+                    shell: Sh
+                    command: |
+                      npm run test:ts  # e.g., "jest --coverage"
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - coverage/junit.xml
+              # Building (TypeScript compilation)
+              - step:
+                  type: Run
+                  identifier: build_ts
+                  name: Build TypeScript
+                  spec:
+                    shell: Sh
+                    command: |
+                      npm run build:ts  # e.g., "tsc" or "tsc --noEmit" for type-check only
+                      npm run build  # Additional JS bundling if needed
+              # Deploy (e.g., Docker build and push for Kubernetes)
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  identifier: docker_deploy
+                  name: Build and Push Docker Image
+                  spec:
+                    connectorRef: your_docker_connector
+                    repo: your-repo/ts-node-app
+                    tags:
+                      - <+pipeline.sequenceId>
+                    dockerfile: ./Dockerfile  # Use multi-stage Dockerfile for TS
+    # Add CD stage for deployment to K8s/ECS
+    - stage:
+        name: Deploy to Kubernetes
+        identifier: deploy_k8s
+        type: CD
+        spec:
+          # ... (infrastructure, service, execution with kubectl apply)
