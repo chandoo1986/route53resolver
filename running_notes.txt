@@ -1,0 +1,28 @@
+Running notes:
+
+ACTION ITEMS:
+- Create dedicated DNS VPC & associated resources (Subnets, NACL's , Security groups(DNS traffic (UDP port 53, and optionally TCP port 53) etc) (Cloud team).
+- Create Resolver endpoints (Cloud team). 
+  - Outbound endpoint. 
+  - Inbound endpoint. 
+- Create Forwarding rules (Cloud team). 
+  - DNS queries from zone onprem.private to on prem 
+  - DNS queries for zone awscloud.private to the IP addresses of the resolver inbound endpoint.
+- Associate the rules with VPC (Cloud team). 
+- Verify connectivity between on prem and DNS VPC (Cloud team).
+- Accept Shared Forwarding Rules (Cloud team). This is not required if rules are shared with entire AWS organization. 
+- Associate Forwarding Rules with VPCs in each participating acount (Cloud team/Devsecops team). 
+- Create Private hosted zones in each participating account(Devsecops team).
+- Associate the private hosted zone with DNS-VPC (Devsecops team). 
+
+
+My notes:
+- Dedicated VPC: 
+Isolates dns infrastructure from other workloads. We can apply rules (security group, NACL) specific to the DNS-VPC without affecting workload VPCs.
+- Solution also mentons that no VPC peering/connectivity is required between source/destination VPC and dns vpc. 
+- DNS traffic and application traffic potentioally exposing DNS infrastructure.
+https://gist.github.com/davidcallen/fc20b75530d79bf1d59dc482a8475a17
+- If centralized. account hosts workloads we need private hosted zone in centralized account. 
+- Prepare cost estimation sheet. 
+
+
